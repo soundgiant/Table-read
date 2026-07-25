@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Drama Club Table Read</title>
+  <title>Jerk Club Table Read</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -19,20 +19,20 @@
 
     body {
       margin: 0;
-      padding: 12px;
+      padding: 8px;
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding-bottom: 100px;
+      padding-bottom: 120px;
     }
 
     header {
       position: sticky;
       top: 0;
       background-color: var(--bg);
-      padding: 8px 0 12px 0;
+      padding: 4px 0 8px 0;
       border-bottom: 1px solid var(--card-bg);
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       z-index: 100;
     }
 
@@ -40,25 +40,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
     select {
       background: var(--card-bg);
       color: var(--accent);
       border: 1px solid var(--accent);
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: bold;
       width: 100%;
     }
 
     .picker-label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       text-align: center;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -74,10 +74,10 @@
       background: var(--card-bg);
       color: var(--text);
       border: 1px solid #334155;
-      padding: 6px 14px;
-      border-radius: 16px;
+      padding: 4px 12px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
     }
 
@@ -88,24 +88,24 @@
     }
 
     .tone-badge {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #e2e8f0;
       background: #334155;
-      padding: 6px 12px;
+      padding: 4px 8px;
       border-radius: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       text-align: center;
       font-style: italic;
     }
 
     .line-card {
       background: var(--card-bg);
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 10px;
-      border-left: 5px solid transparent;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      border-left: 4px solid transparent;
       transition: all 0.2s ease;
-      scroll-margin-top: 140px;
+      scroll-margin-top: 125px; /* Aligns tapped card right below sticky header */
     }
 
     .stage-direction {
@@ -113,36 +113,34 @@
       border: 1px dashed #334155;
       font-style: italic;
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.85rem;
     }
 
     .speaker {
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       letter-spacing: 0.05em;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 2px;
     }
 
     .dialogue {
-      font-size: 1.2rem;
-      line-height: 1.5;
+      font-size: 1.05rem;
+      line-height: 1.35;
     }
 
-    /* Wrylies / Parentheticals formatting */
     .wrylie {
       display: inline-block;
       background: var(--wrylie-bg);
       color: var(--wrylie-text);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       font-style: italic;
-      padding: 2px 8px;
-      border-radius: 6px;
-      margin: 2px 0;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin: 1px 0;
       font-weight: normal;
     }
 
-    /* Highlight Active Character */
     .my-line {
       border-left-color: var(--highlight);
       background: var(--highlight-bg);
@@ -305,7 +303,6 @@
     let selectedChar = 'ALL';
 
     function formatDialogue(text) {
-      // Replaces parentheticals like (Smirking) with formatted wrylies
       return text.replace(/\(([^)]+)\)/g, '<span class="wrylie">($1)</span>');
     }
 
@@ -343,7 +340,7 @@
       const container = document.getElementById('script-container');
       container.innerHTML = '';
 
-      activeData.lines.forEach((item, index) => {
+      activeData.lines.forEach((item) => {
         const card = document.createElement('div');
         
         if (item.type === 'direction') {
@@ -364,9 +361,9 @@
           `;
         }
 
-        // Tap line to scroll to middle of screen
+        // Snap tapped line directly underneath sticky header
         card.onclick = () => {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
         container.appendChild(card);
