@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drama Club Table Read</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --highlight: #f59e0b;
+      --highlight-bg: #451a03;
+      --wrylie-bg: #334155;
+      --wrylie-text: #cbd5e1;
+    }
+
+    body {
+      margin: 0;
+      padding: 12px;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding-bottom: 100px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background-color: var(--bg);
+      padding: 8px 0 12px 0;
+      border-bottom: 1px solid var(--card-bg);
+      margin-bottom: 16px;
+      z-index: 100;
+    }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    select {
+      background: var(--card-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    .picker-label {
+      font-size: 0.8rem;
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .char-buttons {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button.char-btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    button.char-btn.active {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+    }
+
+    .tone-badge {
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      background: #334155;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .line-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-left: 5px solid transparent;
+      transition: all 0.2s ease;
+      scroll-margin-top: 140px;
+    }
+
+    .stage-direction {
+      background: transparent;
+      border: 1px dashed #334155;
+      font-style: italic;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .speaker {
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .dialogue {
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+
+    /* Wrylies / Parentheticals formatting */
+    .wrylie {
+      display: inline-block;
+      background: var(--wrylie-bg);
+      color: var(--wrylie-text);
+      font-size: 0.9rem;
+      font-style: italic;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin: 2px 0;
+      font-weight: normal;
+    }
+
+    /* Highlight Active Character */
+    .my-line {
+      border-left-color: var(--highlight);
+      background: var(--highlight-bg);
+    }
+
+    .my-line .speaker {
+      color: var(--highlight);
+    }
+
+    .other-line {
+      opacity: 0.45;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-row">
+      <select id="script-select" onchange="changeScript(this.value)">
+        <option value="dinner">1. Dinner Table Showdown</option>
+        <option value="potter">2. Harry Potter & Sorcerer's Stone</option>
+        <option value="whos_on_first">3. Who's on First?</option>
+        <option value="widows_bay">4. Widow's Bay</option>
+      </select>
+    </div>
+    <div class="picker-label">I am reading as:</div>
+    <div class="char-buttons" id="char-buttons"></div>
+  </header>
+
+  <div id="tone-display" class="tone-badge"></div>
+  <main id="script-container"></main>
+
+  <script>
+    const scripts = {
+      dinner: {
+        title: "Dinner Table Showdown",
+        tone: "Tone: Modern Sibling Comedy",
+        characters: ["DASH", "VIOLET"],
+        lines: [
+          { type: "direction", text: "(SETTING: The dinner table. DASH is aggressively mashing his potatoes. VIOLET is staring at her plate, annoyed.)" },
+          { speaker: "DASH", text: "(Smirking) You're poking it." },
+          { speaker: "VIOLET", text: "I’m not poking it. I’m moving it." },
+          { speaker: "DASH", text: "You’re poking it. Mom! Vi’s poking her food!" },
+          { speaker: "VIOLET", text: "(Glares, dropping her fork) I am not poking it, Dash! I am rearranging the structural integrity of my meal so it doesn't touch the peas. There’s a difference." },
+          { speaker: "DASH", text: "Yeah, the difference is you're weird." },
+          { speaker: "VIOLET", text: "I am not weird! I am perceptive. You’re the one who eats like a blender with the lid off." },
+          { speaker: "DASH", text: "(Grins, taking a massive bite) Efficiency, Vi. It’s called efficiency. While you’re giving your broccoli a personality evaluation, I’m ready for dessert." },
+          { speaker: "VIOLET", text: "(Crosses her arms, leaning back) You know, normal people chew. It’s this cool thing where you break food down before swallowing it whole. You should try it sometime." },
+          { speaker: "DASH", text: "(Leaning in) Normal people also leave the house without wearing invisible force fields." },
+          { speaker: "VIOLET", text: "(Gasps, slamming her hands on the table) Shut up!" },
+          { speaker: "DASH", text: "You shut up!" },
+          { speaker: "VIOLET", text: "You make me!" },
+          { speaker: "DASH AND VIOLET", text: "MOM!!!!!!!" }
+        ]
+      },
+      potter: {
+        title: "Harry Potter and the Sorcerer's Stone",
+        tone: "Tone: Fantasy Ensemble / Accent & Character Practice",
+        characters: ["RON", "HERMIONE", "PROFESSOR FLITWICK"],
+        lines: [
+          { type: "direction", text: "(SETTING: The Hogwarts Charms classroom. Desks are filled with students, each with a single white feather resting in front of them.)" },
+          { speaker: "PROFESSOR FLITWICK", text: "(Addressing the classroom from atop his stack of books) One of a wizard’s most rudimentary skills is levitation, or the ability to make objects fly. Do you have your feathers ready? Good! Now, don’t forget the nice wrist movement we’ve been practicing. The swish and flick! Remember, swish and flick. And enunciate! Wingardium Leviosa! Off you go then!" },
+          { type: "direction", text: "(The classroom fills with the sound of students muttering spells and waving their wands. RON sits next to HERMIONE, aggressively whipping his wand up and down at his feather.)" },
+          { speaker: "RON", text: "(Exaggerated wand motions) Wingardium Leviosaaah! Wingardium Leviosaaah!" },
+          { speaker: "HERMIONE", text: "(Reaching over to grab Ron’s wrist to stop him) Stop, stop, stop! You’re going to take someone’s eye out. Besides, you’re saying it wrong. It’s Lev-i-OH-sa, not Lev-i-o-SAA." },
+          { speaker: "RON", text: "(Snatching his wrist back, glaring at her) You do it then, if you’re so clever. Go on, go on!" },
+          { speaker: "HERMIONE", text: "(Sits up straight, smooths her robes, and flicks her wand with perfect precision) Wingardium Leviosa." },
+          { type: "direction", text: "(Hermione’s feather begins to glow slightly, then slowly floats off the desk, hovering several feet in the air.)" },
+          { speaker: "PROFESSOR FLITWICK", text: "(Gasping in absolute delight) Oh, well done! See here, everyone! Miss Granger’s done it! Oh, splendid!" },
+          { speaker: "RON", text: "(Staring up at the floating feather, completely defeated, then slumping down onto his desk) ...Oh, well done." },
+          { speaker: "HERMIONE", text: "(Smiles proudly, watching the feather rise) See? Swish and flick." },
+          { speaker: "RON", text: "(Muttering under his breath to Harry) Mental, she is. Honest." }
+        ]
+      },
+      whos_on_first: {
+        title: "Who's on First?",
+        tone: "Tone: Classic Vaudeville / Fast-Paced Comedy",
+        characters: ["ABBOTT", "COSTELLO"],
+        lines: [
+          { type: "direction", text: "(SETTING: COSTELLO sits across from ABBOTT at the table, leaning in.)" },
+          { speaker: "COSTELLO", text: "Hey Abbott! I hear you're managing the new baseball team this season." },
+          { speaker: "ABBOTT", text: "That's right." },
+          { speaker: "COSTELLO", text: "Well, I want to learn the players' names so when I'm on the field, I know who I'm playing with." },
+          { speaker: "ABBOTT", text: "Oh, sure! Though you know, funny names nowadays. They give strange names to ballplayers." },
+          { speaker: "COSTELLO", text: "Like what?" },
+          { speaker: "ABBOTT", text: "Well, let's see. We have Who on first base, What on second base, and I Don't Know on third base." },
+          { speaker: "COSTELLO", text: "(Confused) That's what I want to find out! I want to know the names of the guys on the team!" },
+          { speaker: "ABBOTT", text: "(Patiently) I'm telling you! Who's on first, What's on second, I Don't Know's on third." },
+          { speaker: "COSTELLO", text: "(Slowly, leaning across table) You're the manager, right?" },
+          { speaker: "ABBOTT", text: "Yes." },
+          { speaker: "COSTELLO", text: "Do you know the guy's name on first base?" },
+          { speaker: "ABBOTT", text: "Certainly!" },
+          { speaker: "COSTELLO", text: "Well then, who is playing first base?" },
+          { speaker: "ABBOTT", text: "Yes!" },
+          { speaker: "COSTELLO", text: "(Pause) ...I'm asking you, who's on first?" },
+          { speaker: "ABBOTT", text: "That's right." },
+          { speaker: "COSTELLO", text: "(Getting agitated) When you pay the first baseman his salary every month, who gets the money?" },
+          { speaker: "ABBOTT", text: "Every penny of it!" },
+          { speaker: "COSTELLO", text: "All I'm asking is: what is the guy's name on first base?" },
+          { speaker: "ABBOTT", text: "No, What is on second base." },
+          { speaker: "COSTELLO", text: "(Louder) I'm not asking you who's on second!" },
+          { speaker: "ABBOTT", text: "Who is on first!" },
+          { speaker: "COSTELLO", text: "I DON'T KNOW!" },
+          { speaker: "ABBOTT", text: "(Pointing across table) Third base!" },
+          { speaker: "COSTELLO", text: "(Takes a deep breath, rubs his temples) Look. You got an outfield?" },
+          { speaker: "ABBOTT", text: "Sure." },
+          { speaker: "COSTELLO", text: "The left fielder's name?" },
+          { speaker: "ABBOTT", text: "Why." },
+          { speaker: "COSTELLO", text: "(Sighs) Because!" },
+          { speaker: "ABBOTT", text: "Oh, he's in center field." },
+          { speaker: "COSTELLO", text: "(Throws hands up) Wait a minute... you got a pitcher on this team?" },
+          { speaker: "ABBOTT", text: "Wouldn't be much of a team without a pitcher!" },
+          { speaker: "COSTELLO", text: "What's the pitcher's name?" },
+          { speaker: "ABBOTT", text: "Tomorrow." },
+          { speaker: "COSTELLO", text: "You don't want to tell me today?" },
+          { speaker: "ABBOTT", text: "I'm telling you now!" },
+          { speaker: "COSTELLO", text: "Then go ahead!" },
+          { speaker: "ABBOTT", text: "Tomorrow!" },
+          { speaker: "COSTELLO", text: "(Stares blankly) ...What time?" },
+          { speaker: "ABBOTT", text: "What time what?" },
+          { speaker: "COSTELLO", text: "What time tomorrow are you gonna tell me who's pitching?!" },
+          { speaker: "ABBOTT", text: "Now listen! Who is on first—" },
+          { speaker: "COSTELLO", text: "(Interrupting) I'm not asking you who's on first!" },
+          { speaker: "ABBOTT", text: "I'm just telling you who's on first!" },
+          { speaker: "COSTELLO", text: "(Desperate, pleading) Okay, okay... let me break this down. Let's say I'm the catcher. I catch the ball. The batter pops up. I pick up the ball and throw it to first base. Now, WHO catches the ball on first base?" },
+          { speaker: "ABBOTT", text: "Naturally!" },
+          { speaker: "COSTELLO", text: "(Blinks) Naturally?" },
+          { speaker: "ABBOTT", text: "Naturally." },
+          { speaker: "COSTELLO", text: "So I pick up the ball, and I throw it to Naturally?" },
+          { speaker: "ABBOTT", text: "No! You throw the ball to Who!" },
+          { speaker: "COSTELLO", text: "Naturally!" },
+          { speaker: "ABBOTT", text: "That's it!" },
+          { speaker: "COSTELLO", text: "THAT'S WHAT I SAID!" },
+          { speaker: "ABBOTT", text: "No, you didn't. You said Naturally." },
+          { speaker: "COSTELLO", text: "I throw the ball to WHO?!" },
+          { speaker: "ABBOTT", text: "Naturally!" },
+          { speaker: "COSTELLO", text: "(Slaps table) SAME THING!" },
+          { speaker: "ABBOTT", text: "No, it's not the same thing. Who is on first, What is on second, I Don't Know is on third..." },
+          { speaker: "COSTELLO", text: "(Screaming) I DON'T CARE!" },
+          { speaker: "ABBOTT", text: "(Cheerfully) Oh, that's our shortstop!" },
+          { speaker: "COSTELLO", text: "(Freezes, slowly drops head onto table) ...I give up." }
+        ]
+      },
+      widows_bay: {
+        title: "Widow's Bay",
+        tone: "Tone: High-Stakes Dramatic Monologue & Intensity",
+        characters: ["WYCK", "TOM"],
+        lines: [
+          { type: "direction", text: "(SETTING: A dimly lit boat. WYCK is sitting stiffly, staring blankly ahead as if looking out at the dark ocean. TOM stands nearby.)" },
+          { speaker: "WYCK", text: "(Softly, voice gravelly and distant) I was just sixteen. It was a bad time on the island... (Pauses, shaking his head slightly) So the island’s on lockdown. There’s curfews... people going missing. The perfect time for a fishing expedition. (A faint, bitter half-smile) Me and my four buddies... we decide to steal a boat. Get it out on the white waves... test our mettle. (Nodding quietly to himself) Yeah. Yeah... (His breathing quickens; his posture stiffens as the memory resurfaces) It struck from below at first. Struck hard. This thing was big... it was gonna tear the boat apart in seconds. And then I hear Ricky say he saw… saw a tentacle. (Voice dropping to an urgent, panicked whisper) Just like that... we become little boys again, screaming for our mothers. And I… and I’m… I know I gotta get outta there. You know, before the whole thing sinks. Before we’re dragged into its mouth. (Hands beginning to tremble) And, so… I start to swim off. And that… that’s when I felt it grab my foot. I was so scared. I mean, it’s… it’s pulling on me, and I’m trying to get away! And then I realize... it’s Mark. Begging for help. (Gasping for air, voice cracking with shame) And now... we’re both getting pulled under, and I… and I see that thing below him. We’re both getting dragged down, and I… and I… (A heavy, gut-wrenching pause; eyes locked on the floor) I kicked him off me. (A harsh, barely audible whisper) Kicked him off me." },
+          { speaker: "TOM", text: "Wyck... that wasn’t your fault." },
+          { speaker: "WYCK", text: "(Snapping instantly, eyes blazing with sudden, terrifying intensity) I only told you that story so that you’ll listen to me one ducking time! Do not let him out!" },
+          { speaker: "TOM", text: "I let him out" },
+          { speaker: "WYCK", text: "(Freezes, complete horror washing over his face, followed by pure, venomous rage) Goshdarn you to hell! (Slumping back into his chair, whispering in grim defeat) Yeah. Yeah... Yeah." }
+        ]
+      }
+    };
+
+    let currentScriptKey = 'dinner';
+    let selectedChar = 'ALL';
+
+    function formatDialogue(text) {
+      // Replaces parentheticals like (Smirking) with formatted wrylies
+      return text.replace(/\(([^)]+)\)/g, '<span class="wrylie">($1)</span>');
+    }
+
+    function changeScript(scriptKey) {
+      currentScriptKey = scriptKey;
+      selectedChar = 'ALL';
+      renderCharButtons();
+      renderScript();
+    }
+
+    function renderCharButtons() {
+      const btnContainer = document.getElementById('char-buttons');
+      btnContainer.innerHTML = '';
+
+      const chars = ['ALL', ...scripts[currentScriptKey].characters];
+      
+      chars.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = `char-btn ${c === selectedChar ? 'active' : ''}`;
+        btn.textContent = c === 'ALL' ? 'Both / All' : c;
+        btn.onclick = () => {
+          selectedChar = c;
+          document.querySelectorAll('.char-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderScript();
+        };
+        btnContainer.appendChild(btn);
+      });
+    }
+
+    function renderScript() {
+      const activeData = scripts[currentScriptKey];
+      document.getElementById('tone-display').textContent = activeData.tone;
+
+      const container = document.getElementById('script-container');
+      container.innerHTML = '';
+
+      activeData.lines.forEach((item, index) => {
+        const card = document.createElement('div');
+        
+        if (item.type === 'direction') {
+          card.className = 'line-card stage-direction';
+          card.innerHTML = formatDialogue(item.text);
+        } else {
+          card.className = 'line-card';
+          
+          const isMyLine = selectedChar !== 'ALL' && (item.speaker === selectedChar || item.speaker.includes(selectedChar));
+          const isOtherLine = selectedChar !== 'ALL' && !isMyLine;
+
+          if (isMyLine) card.classList.add('my-line');
+          if (isOtherLine) card.classList.add('other-line');
+
+          card.innerHTML = `
+            <div class="speaker">${item.speaker}</div>
+            <div class="dialogue">${formatDialogue(item.text)}</div>
+          `;
+        }
+
+        // Tap line to scroll to middle of screen
+        card.onclick = () => {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    // Initial Load
+    renderCharButtons();
+    renderScript();
+  </script>
+</body>
+</html>
